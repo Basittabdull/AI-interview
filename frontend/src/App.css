@@ -1,0 +1,80 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #f0f2f5;
+}
+
+.container {
+  width: 80%;
+  max-width: 1200px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+h1, h2, h3 {
+  text-align: center;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#video-feeds {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+#candidate-video, #eva-avatar {
+  width: 45%;
+  min-height: 240px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#transcript-container {
+  height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+#coding-challenge {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+textarea {
+  width: calc(100% - 20px);
+  height: 200px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
