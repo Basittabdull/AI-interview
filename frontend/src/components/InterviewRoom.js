@@ -9,7 +9,7 @@ const InterviewRoom = ({ transcript, evaState }) => {
   };
 
   return (
-    <div>
+    <div id="interview-room">
       <div id="video-feeds">
         <div id="candidate-video-container">
           <h3>Your Video</h3>
@@ -35,7 +35,7 @@ const InterviewRoom = ({ transcript, evaState }) => {
       <div id="coding-challenge-tab">
         <button onClick={toggleCodingChallenge}>Show/Hide Coding Challenge</button>
       </div>
-      {showCodingChallenge && <CodingChallenge />}
+      <CodingChallenge show={showCodingChallenge} />
     </div>
   );
 };
