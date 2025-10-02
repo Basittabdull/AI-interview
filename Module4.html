@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentFlow AI Interview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root, body[data-theme='ocean'] {
+            --primary-color: #0891B2;
+            --primary-hover-color: #06B6D4;
+            --text-color-dark: #1E293B;
+            --text-color-medium: #64748B;
+            --text-color-light: #94A3B8;
+            --background-color: #F8FAFC;
+            --card-background: #FFFFFF;
+            --border-color: #E2E8F0;
+            --success-color: #10B981;
+            --danger-color: #EF4444;
+        }
+
+        body[data-theme='dark'] {
+            --primary-color: #22D3EE;
+            --primary-hover-color: #67E8F9;
+            --text-color-dark: #F8FAFC;
+            --text-color-medium: #94A3B8;
+            --text-color-light: #64748B;
+            --background-color: #0F172A;
+            --card-background: #1E293B;
+            --border-color: #334155;
+            --success-color: #22C55E;
+            --danger-color: #F87171;
+        }
+
+        @keyframes glow {
+            from { background-color: transparent; }
+            to { background-color: rgba(34, 211, 238, 0.1); }
+        }
+
+        /* --- Theme Switcher --- */
+        .theme-switcher { position: relative; }
+        #theme-btn { background: none; border: none; cursor: pointer; color: var(--text-color-medium); padding: 4px;}
+        #theme-dropdown { position: absolute; top: 140%; right: 0; background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 8px; display: none; width: 150px; z-index: 1001; }
+        #theme-dropdown.show { display: block; }
+        .theme-option { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 6px; cursor: pointer; }
+        .theme-option:hover { background-color: var(--background-color); }
+        .theme-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--border-color); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            line-height: 1.6;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        /* --- Header & Footer --- */
+        .app-header, .app-footer {
+            flex-shrink: 0;
+            padding: 20px 24px;
+            background-color: var(--card-background);
+            border-color: var(--border-color);
+        }
+        .app-header { border-bottom: 1px solid var(--border-color); }
+        .logo { font-weight: 700; font-size: 1.5rem; display: flex; align-items: center; gap: 8px; color: var(--primary-color); }
+        .app-footer { border-top: 1px solid var(--border-color); text-align: center; font-size: 0.875rem; color: var(--text-color-light); }
+        .app-footer a { color: var(--text-color-medium); text-decoration: none; margin: 0 8px; }
+        .app-footer a:hover { color: var(--primary-color); }
+
+        /* --- Page Sections --- */
+        .page { display: none; flex-direction: column; align-items: center; text-align: center; width: 100%; }
+        .page.active { display: flex; }
+        
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: 1px solid transparent; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover-color); }
+        .btn-primary:disabled { background-color: #94A3B8; cursor: not-allowed; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+
+        /* --- Screen 1: Instructions --- */
+        #instruction-page .welcome-message { font-size: 2rem; font-weight: 700; margin: 24px 0; max-width: 600px; }
+        .instructions-list { list-style: none; text-align: left; max-width: 500px; margin-bottom: 40px; display: grid; gap: 24px; }
+        .instructions-list li { display: flex; align-items: center; gap: 16px; font-size: 1.1rem; }
+        .instructions-list .icon { color: var(--primary-color); }
+        
+        /* --- Screen 2: Hardware Check --- */
+        #hardware-check-page h1 { font-size: 1.75rem; margin: 16px 0 24px; }
+        .hardware-check-area { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        .check-item { background-color: var(--card-background); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .video-feed-container { background-color: #000; border-radius: 8px; overflow: hidden; aspect-ratio: 4 / 3; position: relative; }
+        .video-feed-container video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .mic-check-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
+        #mic-visualizer { width: 100%; height: 60px; background-color: var(--background-color); border-radius: 8px; position: relative; overflow: hidden; }
+        #mic-level { position: absolute; top: 0; left: 0; height: 100%; background-color: var(--success-color); width: 0%; transition: width 0.1s linear; }
+        .status-indicators { margin-top: 16px; display: grid; gap: 8px; }
+        .status { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .status.success { color: var(--success-color); }
+        .status.pending { color: var(--text-color-medium); }
+
+        /* --- Screen 3: Interview Room --- */
+        .interview-room { width: 100%; flex-grow: 1; display: flex; flex-direction: column; }
+        .interview-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
+        .proctoring-notice { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; color: var(--text-color-medium); }
+        #timer { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); }
+        
+        .interview-tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+        .tab-button { padding: 12px 20px; border: none; background: none; cursor: pointer; color: var(--text-color-medium); border-bottom: 2px solid transparent; font-size: 1rem; transition: color 0.2s, border-color 0.2s; }
+        .tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); font-weight: 600; }
+        .tab-button.notify { animation: glow 1.5s infinite alternate; }
+
+        @keyframes glow {
+            from { background-color: transparent; }
+            to { background-color: #CFFAFE; }
+        }
+        
+        .interview-tab-content { flex-grow: 1; position: relative; }
+        .tab-panel { display: none; height: 100%; }
+        .tab-panel.active { display: flex; }
+        
+        .ai-conversation-view { width: 100%; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+        #candidate-video-container { position: absolute; bottom: 24px; right: 24px; width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background-color: var(--card-background); }
+        .video-feed-container { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .avatar-placeholder { background-color: var(--text-color-dark); color: var(--background-color); font-size: 3rem; font-weight: 600; display: none; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        .video-feed-container.video-off .avatar-placeholder { display: flex; }
+        .video-feed-container.video-off video { display: none; }
+        
+        #call-controls { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 8px; background-color: rgba(0,0,0,0.3); backdrop-filter: blur(4px); }
+        .control-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; }
+        .control-btn.danger { color: var(--danger-color); }
+
+        .ai-avatar { width: 150px; height: 150px; position: relative; margin-bottom: 24px; }
+        .ai-avatar-orb { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, var(--primary-hover-color) 0%, var(--primary-color) 100%); transition: transform 0.3s ease; }
+        .ai-avatar.speaking .ai-avatar-orb { animation: pulse 1.5s infinite; }
+        .ai-avatar.listening .ai-avatar-orb { transform: scale(1.1); }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(6, 182, 212, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+        }
+
+        .conversation-status { text-align: center; height: 120px; }
+        .status-text { font-size: 1.5rem; font-weight: 500; color: var(--text-color-medium); margin-bottom: 16px; }
+        .transcript-text { min-height: 50px; font-size: 1.1rem; }
+        
+        .coding-challenge-view { width: 100%; display: grid; grid-template-columns: 350px 1fr; gap: 24px; padding-top: 24px; }
+        .problem-description { background-color: var(--card-background); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; overflow-y: auto; }
+        .problem-description h2 { margin-bottom: 16px; }
+        .problem-description pre { background-color: var(--background-color); padding: 12px; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; }
+        .coding-area { display: flex; flex-direction: column; }
+        .code-editor-container { flex-grow: 1; position: relative; background-color: #1E293B; color: #F8FAFC; border-radius: 12px; overflow: hidden; }
+        #code-editor { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; border: none; color: inherit; font-family: monospace; font-size: 1rem; line-height: 1.5; padding: 20px; resize: none; }
+        #code-editor:focus { outline: none; }
+        .coding-actions { margin-top: 16px; display: flex; justify-content: flex-end; gap: 12px; }
+
+        @media (max-width: 850px) {
+            .hardware-check-area, .coding-challenge-view { grid-template-columns: 1fr; }
+            #candidate-video-container { width: 180px; bottom: 16px; right: 16px; }
+            .ai-avatar { width: 120px; height: 120px; }
+            .status-text { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            TalentFlow
+        </div>
+        <div class="theme-switcher">
+            <button id="theme-btn" title="Change theme"><i data-lucide="palette"></i></button>
+            <div id="theme-dropdown">
+                <div class="theme-option" data-theme-value="ocean"><span class="theme-swatch" style="background-color: #0891B2;"></span> Ocean</div>
+                <div class="theme-option" data-theme-value="dark"><span class="theme-swatch" style="background-color: #1F2937;"></span> Dark</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <!-- SCREEN 1: INSTRUCTIONS -->
+        <section id="instruction-page" class="page active">
+            <h1 class="welcome-message">AI-powered interview for the Senior Python Developer role</h1>
+            <ul class="instructions-list">
+                <li><i data-lucide="bot" class="icon"></i> <span>This is a conversational interview with our AI agent, <strong>Eva</strong>.</span></li>
+                <li><i data-lucide="mic" class="icon"></i> <span>Eva will ask you questions verbally. Please respond clearly when prompted.</span></li>
+                <li><i data-lucide="code-2" class="icon"></i> <span>The interview also includes a <strong>coding challenge</strong>.</span></li>
+                <li><i data-lucide="clock" class="icon"></i> <span>The entire session will take approximately <strong>20 minutes</strong>.</span></li>
+            </ul>
+            <button id="get-started-btn" class="btn btn-primary">Get Started</button>
+        </section>
+
+        <!-- SCREEN 2: HARDWARE CHECK -->
+        <section id="hardware-check-page" class="page">
+            <h1>Let's Check Your Setup</h1>
+            <div class="hardware-check-area">
+                <div class="check-item"><div class="video-feed-container"><video id="webcam-feed" autoplay muted playsinline></video></div><div class="status-indicators"><div id="camera-status" class="status pending"><i data-lucide="x-circle"></i> <span>Camera not detected</span></div><div id="mic-status" class="status pending"><i data-lucide="x-circle"></i> <span>Microphone not detected</span></div></div></div>
+                <div class="check-item"><p>Please speak to test your microphone.</p><div class="mic-check-container"><div id="mic-visualizer"><div id="mic-level"></div></div></div><div style="margin-top: 24px;"><p>Look at the camera for a verification photo.</p><button id="take-photo-btn" class="btn btn-primary" style="width:100%; margin-top: 8px;" disabled>Take Photo</button><div id="photo-status" class="status pending" style="margin-top: 8px; justify-content: center;"><i data-lucide="x-circle"></i> <span>Photo not taken</span></div></div></div>
+            </div>
+            <button id="enter-interview-btn" class="btn btn-primary" disabled>Enter Interview</button>
+        </section>
+
+        <!-- SCREEN 3: INTERVIEW ROOM -->
+        <section id="interview-room-page" class="page">
+            <div class="interview-room">
+                <div class="interview-header">
+                    <div class="proctoring-notice" title="To ensure a fair and consistent process for all candidates, AI-powered proctoring is enabled.">
+                        <i data-lucide="shield"></i> <span>AI Proctoring Active</span>
+                    </div>
+                    <span id="timer">20:00 remaining</span>
+                </div>
+                
+                <div class="interview-tabs">
+                    <button class="tab-button active" data-tab="conversation">Conversation</button>
+                    <button class="tab-button" data-tab="coding" id="coding-tab-btn" disabled>Coding Challenge</button>
+                </div>
+                
+                <div class="interview-tab-content">
+                    <div class="tab-panel active" id="conversation-panel">
+                        <div class="ai-conversation-view">
+                            <div class="ai-avatar" id="ai-avatar">
+                                <div class="ai-avatar-orb"></div>
+                            </div>
+                            <div class="conversation-status">
+                                <p class="status-text" id="status-text">Connecting to Eva...</p>
+                                <p class="transcript-text" id="transcript-text"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-panel" id="coding-panel">
+                        <div class="coding-challenge-view">
+                            <div class="problem-description">
+                                <h2 id="coding-problem-title"></h2>
+                                <p id="coding-problem-text"></p>
+                            </div>
+                            <div class="coding-area">
+                                <div class="code-editor-container">
+                                    <textarea id="code-editor" spellcheck="false"></textarea>
+                                </div>
+                                <div class="coding-actions">
+                                    <button id="run-code-btn" class="btn btn-secondary"><i data-lucide="play"></i> Run Code</button>
+                                    <button id="submit-code-btn" class="btn btn-primary"><i data-lucide="check-circle"></i> Submit Code</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <div id="candidate-video-container">
+                    <div class="video-feed-container" id="user-video-feed">
+                        <video id="interview-webcam-feed" autoplay muted playsinline></video>
+                        <div class="avatar-placeholder" id="avatar-placeholder"></div>
+                    </div>
+                    <div id="call-controls">
+                        <button class="control-btn" id="mic-toggle-btn" title="Mute/Unmute"><i data-lucide="mic"></i></button>
+                        <button class="control-btn" id="video-toggle-btn" title="Stop/Start Video"><i data-lucide="video"></i></button>
+                        <button class="control-btn danger" id="finish-interview-btn" title="Finish Interview"><i data-lucide="phone-off"></i></button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <a href="#">Privacy Policy</a> &bull; <a href="#">Technical Support</a>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const pages = {
+            instruction: document.getElementById('instruction-page'),
+            hardwareCheck: document.getElementById('hardware-check-page'),
+            interviewRoom: document.getElementById('interview-room-page'),
+        };
+        const showPage = (pageName) => {
+            Object.values(pages).forEach(page => page.classList.remove('active'));
+            pages[pageName].classList.add('active');
+            lucide.createIcons();
+        };
+
+        let localStream = null;
+        let interviewTimer = null;
+        const hardwareStatus = { camera: false, mic: false, photo: false };
+        const interviewFlow = [
+            { type: 'verbal', text: "Hello, I'm Eva, your AI interviewer. Thanks for joining. Let's start with our first question: Can you tell me about a time you had to handle a difficult project deadline?" },
+            { type: 'verbal', text: 'That sounds challenging. How do you approach learning a new technology or framework?' },
+            { type: 'verbal', text: 'Interesting. What would you say is your biggest strength and how has it helped you in your career?' },
+            { type: 'coding', text: "Thank you for sharing that. Now, we'll move on to a short coding challenge. The problem will appear on the 'Coding Challenge' tab." },
+            { type: 'post-coding', text: "Thank you for submitting your solution. That concludes our technical assessment. We're now at the end of our scheduled time." },
+            { type: 'end', text: "On behalf of the team, thank you for your time today. We'll be in touch with the next steps. Have a great day!" }
+        ];
+        const codingProblem = { title: "Reverse a String", description: "Write a Python function to reverse a string without using any built-in reverse functions or slicing shorthands like `[::-1]`." };
+        let currentFlowIndex = 0;
+
+        // --- Page 1 & 2 Logic (unchanged) ---
+        document.getElementById('get-started-btn').addEventListener('click', () => { showPage('hardwareCheck'); initHardwareCheck(); });
+        const webcamFeed = document.getElementById('webcam-feed');
+        const takePhotoBtn = document.getElementById('take-photo-btn');
+        const enterInterviewBtn = document.getElementById('enter-interview-btn');
+        async function initHardwareCheck() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                webcamFeed.srcObject = localStream;
+                updateStatus('camera', true);
+                const audioContext = new AudioContext();
+                const source = audioContext.createMediaStreamSource(localStream);
+                const analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                const micLevel = document.getElementById('mic-level');
+                function checkMicLevel() {
+                    if (!pages.hardwareCheck.classList.contains('active')) return;
+                    analyser.getByteFrequencyData(dataArray);
+                    let average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+                    micLevel.style.width = `${Math.min(100, average * 2)}%`;
+                    if(average > 5 && !hardwareStatus.mic) updateStatus('mic', true);
+                    requestAnimationFrame(checkMicLevel);
+                }
+                checkMicLevel();
+            } catch (err) { console.error("Error accessing media devices.", err); updateStatus('camera', false); updateStatus('mic', false); }
+        }
+        function updateStatus(type, success) {
+            const statusEl = document.getElementById(`${type}-status`);
+            hardwareStatus[type] = success;
+            statusEl.className = `status ${success ? 'success' : 'pending'}`;
+            statusEl.innerHTML = `<i data-lucide="${success ? 'check-circle' : 'x-circle'}"></i> <span>${type.charAt(0).toUpperCase() + type.slice(1)} ${success ? 'detected' : 'not detected'}</span>`;
+            if (type !== 'photo') takePhotoBtn.disabled = !(hardwareStatus.camera && hardwareStatus.mic);
+            checkAllHardwareReady();
+            lucide.createIcons();
+        }
+        takePhotoBtn.addEventListener('click', () => updateStatus('photo', true));
+        function checkAllHardwareReady() { enterInterviewBtn.disabled = !(hardwareStatus.camera && hardwareStatus.mic && hardwareStatus.photo); }
+        enterInterviewBtn.addEventListener('click', () => { showPage('interviewRoom'); startInterview(); });
+
+        // --- Page 3: Interview ---
+        const timerEl = document.getElementById('timer');
+        const interviewWebcamFeed = document.getElementById('interview-webcam-feed');
+        const aiAvatar = document.getElementById('ai-avatar');
+        const statusText = document.getElementById('status-text');
+        const transcriptText = document.getElementById('transcript-text');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        const codingTabBtn = document.getElementById('coding-tab-btn');
+        const avatarPlaceholder = document.getElementById('avatar-placeholder');
+
+        function startInterview() {
+            if (localStream) interviewWebcamFeed.srcObject = localStream;
+            avatarPlaceholder.textContent = 'You'; // Placeholder for user initials, could be dynamic
+            let timeRemaining = 20 * 60;
+            interviewTimer = setInterval(() => {
+                timeRemaining--;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds} remaining`;
+                if(timeRemaining <= 0) { clearInterval(interviewTimer); endInterview("Interview time has expired."); }
+            }, 1000);
+            setTimeout(processNextFlowItem, 2000);
+        }
+
+        function processNextFlowItem() {
+            if (currentFlowIndex >= interviewFlow.length) { endInterview("You have completed all questions."); return; }
+            const item = interviewFlow[currentFlowIndex];
+            transcriptText.textContent = '';
+            
+            if (item.type === 'verbal' || item.type === 'post-coding' || item.type === 'end') { aiSpeak(item.text, item.type === 'end'); } 
+            else if (item.type === 'coding') { aiSpeakAndTransitionToCode(item.text); }
+        }
+
+        function aiSpeak(text, isFinal = false) {
+            statusText.textContent = 'Eva is speaking...';
+            aiAvatar.classList.add('speaking');
+            const speakDuration = Math.max(2000, text.length * 60);
+            setTimeout(() => { 
+                aiAvatar.classList.remove('speaking');
+                if (isFinal) {
+                    endInterview("Interview Complete");
+                } else {
+                    startListening();
+                }
+            }, speakDuration);
+        }
+
+        function startListening() {
+            statusText.textContent = 'Please begin speaking now...';
+            aiAvatar.classList.add('listening');
+            simulateTranscription("This is a simulated answer where the candidate talks about meeting a tight deadline by prioritizing tasks and collaborating with the team to overcome obstacles.");
+        }
+
+        function simulateTranscription(fullText) {
+            const words = fullText.split(' ');
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < words.length) { transcriptText.textContent += words[i] + ' '; i++; } 
+                else { clearInterval(interval); stopListening(); }
+            }, 150);
+        }
+
+        function stopListening() {
+            aiAvatar.classList.remove('listening');
+            statusText.textContent = 'Thinking...';
+            setTimeout(() => { currentFlowIndex++; processNextFlowItem(); }, 2000);
+        }
+
+        function aiSpeakAndTransitionToCode(text) {
+            statusText.textContent = 'Eva is speaking...';
+            aiAvatar.classList.add('speaking');
+            const speakDuration = Math.max(2000, text.length * 60);
+            setTimeout(() => {
+                aiAvatar.classList.remove('speaking');
+                statusText.textContent = 'Please proceed to the coding challenge.';
+                setupCodingChallenge();
+            }, speakDuration);
+        }
+
+        function setupCodingChallenge() {
+            codingTabBtn.disabled = false;
+            codingTabBtn.classList.add('notify');
+            document.getElementById('coding-problem-title').textContent = codingProblem.title;
+            document.getElementById('coding-problem-text').textContent = codingProblem.description;
+        }
+
+        function endInterview(message = "Thank you for completing the interview!") {
+            clearInterval(interviewTimer);
+            if(localStream) { localStream.getTracks().forEach(track => track.stop()); }
+            const conversationPanel = document.getElementById('conversation-panel');
+            conversationPanel.innerHTML = `<div class="ai-conversation-view"><div style="background:var(--card-background); padding:40px; border-radius:12px; border: 1px solid var(--border-color);"><i data-lucide="check-circle" style="color:var(--success-color); width: 48px; height: 48px;"></i><h2 style="font-size:1.5rem; margin:16px 0;">${message}</h2><p class="transcript-text" style="color:var(--text-color-medium);">You may now close this window.</p><button class="btn btn-primary" style="margin-top:24px;" onclick="window.close();">Close Window</button></div></div>`;
+            switchTab('conversation');
+            codingTabBtn.disabled = true;
+            document.getElementById('candidate-video-container').style.display = 'none';
+            lucide.createIcons();
+        }
+
+        // Tab Switching Logic
+        tabButtons.forEach(button => button.addEventListener('click', () => { if (!button.disabled) switchTab(button.dataset.tab); }));
+        function switchTab(activeTab) {
+            if (activeTab === 'coding') { codingTabBtn.classList.remove('notify'); }
+            tabButtons.forEach(button => button.classList.toggle('active', button.dataset.tab === activeTab));
+            tabPanels.forEach(panel => panel.classList.toggle('active', panel.id === `${activeTab}-panel`));
+        }
+
+        // Call Controls
+        const micBtn = document.getElementById('mic-toggle-btn');
+        const videoBtn = document.getElementById('video-toggle-btn');
+        const finishBtn = document.getElementById('finish-interview-btn');
+        const userVideoFeed = document.getElementById('user-video-feed');
+
+        micBtn.addEventListener('click', () => {
+            const audioTrack = localStream.getAudioTracks()[0];
+            audioTrack.enabled = !audioTrack.enabled;
+            micBtn.innerHTML = `<i data-lucide="${audioTrack.enabled ? 'mic' : 'mic-off'}"></i>`;
+            lucide.createIcons();
+        });
+        videoBtn.addEventListener('click', () => {
+            const videoTrack = localStream.getVideoTracks()[0];
+            videoTrack.enabled = !videoTrack.enabled;
+            videoBtn.innerHTML = `<i data-lucide="${videoTrack.enabled ? 'video' : 'video-off'}"></i>`;
+            userVideoFeed.classList.toggle('video-off', !videoTrack.enabled);
+            lucide.createIcons();
+        });
+        finishBtn.addEventListener('click', () => { endInterview("Interview finished by candidate."); });
+        
+        document.getElementById('submit-code-btn').addEventListener('click', () => {
+             // Instead of ending, go to next flow item.
+            currentFlowIndex++;
+            switchTab('conversation');
+            processNextFlowItem();
+        });
+        
+        lucide.createIcons();
+
+        // --- THEME SWITCHER LOGIC ---
+        const themeBtn = document.getElementById('theme-btn');
+        const themeDropdown = document.getElementById('theme-dropdown');
+        const themeOptions = document.querySelectorAll('.theme-option');
+        function setTheme(theme) {
+            document.body.dataset.theme = theme;
+            localStorage.setItem('talentflow-theme', theme);
+        }
+        themeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themeDropdown.classList.toggle('show');
+        });
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                setTheme(option.dataset.themeValue);
+            });
+        });
+        window.addEventListener('click', () => themeDropdown.classList.remove('show'));
+        const savedTheme = localStorage.getItem('talentflow-theme') || 'ocean';
+        setTheme(savedTheme);
+    });
+    </script>
+</body>
+</html>
+
